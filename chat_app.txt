@@ -1,3 +1,11 @@
+checked = true for message sender
+add all functions as User methods 
+	add_friend, create_group, send_message, enter_room 	
+change "original_of" related name
+
+sending meesage to clients
+	original Message object AND its copy 
+
 looping through QuerySet, convert the set to a list
 
 prevent adding self to friend
@@ -11,7 +19,7 @@ shell:
 run functions in view.py from python console
 
 open a group
-add people
+add people(friends)
 create a message 
 	only create room (or make the room appear to others) when a first message is sent
 	add boolean active field to the room

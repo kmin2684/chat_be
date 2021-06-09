@@ -7,7 +7,7 @@ class Room(models.Model):
 	name = models.CharField(max_length=255)
 	
 	def __str__(self):
-		return f"room: {self.name}"
+		return f"{self.name}"
 
 # class User(AbstractBaseUser):
 	# email = models.EmailField(max_length=60, blank = True)
@@ -27,7 +27,7 @@ class User(AbstractUser):
 	"members", blank = True)
 
 	def __str__(self):
-		return f"user: {self.username}"
+		return f"{self.username}"
 	
 class Message(models.Model):
 	content = models.TextField()
@@ -36,7 +36,7 @@ class Message(models.Model):
 	room = models.ForeignKey(Room, models.SET_NULL, null = True, related_name = "messages")
 	
 	def __str__(self):
-		return f"message: {self.content}, sender: {self.sender.username}"
+		return f"{self.content}, sender: {self.sender.username}"
 	
 
 class MessageCopy(models.Model):
@@ -48,5 +48,5 @@ class MessageCopy(models.Model):
 		# ordering = ["-time_sent"]
 		
 	def __str__(self):
-		return f"copy: {self.original.content}, sender: {self.original.sender.username}, ownder: {self.owner.username}, checked: {self.checked}"
+		return f"{self.original.content}, sender: {self.original.sender.username}, ownder: {self.owner.username}, checked: {self.checked}"
 
