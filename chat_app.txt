@@ -1,0 +1,198 @@
+looping through QuerySet, convert the set to a list
+
+prevent adding self to friend
+
+shell:
+	load chat_app.models
+	load functions from views.py
+
+
+
+run functions in view.py from python console
+
+open a group
+add people
+create a message 
+	only create room (or make the room appear to others) when a first message is sent
+	add boolean active field to the room
+	only query room with at least one message in a room
+	clinet only submits if a message is sent
+attach to a room and sender
+make copies of the message
+	link to the original message and recipients
+
+clinet:
+	logs in
+	add friends
+	open a group
+	add people to the group
+	
+two pages (single page)
+	friends
+	chats 
+	room
+function add_friend(user)
+
+function create_group(name, users)
+
+function send_message(sender, group)
+
+
+
+review lecture note on custom User model setting
+
+inherit class attribute and set blank=true
+
+make friends symmetrical, but send a request first  
+
+Class Meta.ordering 
+	apply to messages in a group (are contents in join table ordered?)
+
+Many_to_Many schecma <= join table 
+
+should the entire chat history retrieved everytime a user enter the group chat?
+
+review put method so that page does not have to be refreshed upon submission
+
+unread_count:
+	new member joins so that the starting unread_count changes
+	create a new message for each recipient?
+		make an id_not_unique(or id_copies) attribute to group copies of every original message created for each recipient. id_not_unique should be equal to the pk of the original message 
+		for every sent message, check the number of copies that have been read and report 
+			report the read number 
+
+	
+
+	message query timing
+		while a user is logged in 
+		every 5 seconds: 
+			user not in the room: only request for number of new messages. check for a new message (get method)
+			user present in the room: check for new messages AND update the read status (user last present attribute maybe) 
+		everytime a user enters the room: to update the read count (put method)
+		
+			
+	read_by attributes
+		each recipient that has entered the room and read the message 
+			from the client side, how are the read and unread messages distinquished 
+			
+	example case sequence:
+		A creates a new room with A, B, C
+			the room gets added to each user's model attribute
+		A sends a new message to B and C in the group chat
+			a new message object is created, total of three copies
+
+
+message(sender = A, id = 1, content='hi')
+
+message_copied(copy_of = 1, recipient = A, read = TRUE)
+message_copied(copy_of = 1, recipient = B, read = False)
+message_copied(copy_of = 1, recipient = C, read = False)
+
+
+then the message is added to the room, and the server notifies the members
+	flow(Room => Message => Copied_Message) 
+		align messages in reverse choronological order, and for each message look through copied_messages to check the read status of the copy that the user is recipient of. keep checking the original message until read message is found. 
+
+	A(sender): A is the sender so the most recent message is read. Client takes no further action
+		
+	B(receiver, not in the room): The server report the total count of unread messages that belongs to the group. And client displays the number 
+	C(receiver, in the room): 
+
+		
+
+
+			the id of the original message is added to the room's model attribute 
+				the unread_count should be 2 at this point
+			
+		
+		request sent from B and C for an update on new messages and the server responds
+			client notifies the server the id_copies of the most recent message it has downloaded 
+			
+			notify to the server the last message the client has so that only new messages from that point on need to be sent to the client, as opposed to sending the entire conversation history on the group chat. 
+			
+			the server queries new messages within the group chat and send the data to the client
+		
+		B enters the room, and for new messages,(checked until read message is reached), send to the servers the messages that have been newly checked 
+			client sends the id_copies of the most recent message is has downloaded
+		
+		
+		if there are more chats 
+
+purpose of room
+	1. quickly able to search for the chat room a user is engaged in
+	2. quickly query messages part of the chat room
+
+new member joins in a group chat
+	hide previous conversation from the new member 
+		filter by member join time, but not really necessary at this point 
+
+how MtoM is manifested as a Django model?
+
+url in django
+	how js files are referenced in layout.html 
+	how urls are specified in post method in html files
+
+most recent chat move to the top
+
+	1. u1 adds u2, u3, u4 in a group chat 
+		room r1 created and added to u2, u3, and u4's room list
+
+	2. u1 sends a message to the group
+		m1 created
+	
+
+
+group chat 
+	database how
+	create a chat room hash key using the ID key of the users
+		make a unique ID by sorting in some order (ex. if there are three users with id 64, 4, 1005, then the chat room id would be room_4_64_1005 
+			hash table in sql database??
+
+Chatting application
+
+hopefully no need to log in
+	if login needed: 
+		ID: visitor 
+		PW:	123
+
+similar to kakao talk
+add user with ID
+
+tabs:
+	friends
+	chat history 
+
+Model
+	user:
+		friend list
+
+	chat:
+		sender
+		receiver
+		message
+		Date
+		Time 
+
+chat query cases
+	case 1: only received
+
+	case 2: only sent
+
+	case 3: sent and received
+
+	Duplicates 
+		for example there are 3 users, userA, userB, userC, userD
+		
+		case 3: between userA and userB
+		[(HI, ),( ,nice to meet you),(thanks for replying, )]
+
+		case 2: between userA and userC
+		[(Hi, ),(are you ther?, ),(guess no one is ther, )]
+		
+		case 1: between userA and userD
+		[( ,greeting from D), (,still aleep?)]
+
+	for userA, to query all conversations without duplicates...
+		if (sender==userA AND receiver==userB) OR (serder==userB AND receiver==userA) 
+
+	what about group chat?
