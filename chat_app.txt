@@ -1,9 +1,193 @@
+def update_a(update_all, a):
+	update_all(a)
+
+retrieve all messages(room=room_id)
+group by room, and then order by time 
+
+
+table joining in django 
+
+room updating
+	user to rooms through Many_to_Many relationship 
+		room(user_id)
+	for each room, retrieve the latest message
+		message(room=room_id)
+	between the rooms, compare the last sent time
+	sort by the last sent time 
+
+	room join messages join Message_copy 
+
+	how to join many to many 
+
+	room(filter by user) 
+	messages (filter by room) 
+	copy (filter by message and user)
+
+	USER
+	id	username
+
+	ROOM
+	id	room_name 
+
+	ROOM_USER
+	id	room_id		user_id
+
+	MESSAGES
+	id	content		sender_id		time 
+
+	COPY
+	id	message_id	check_status	user_id  
+
+	RESULT
+		COPY_user_id COPY_message_id	MESSAGE_id	MESSAGE_sender_id	MESSAGE_time	MESSAGE_content	MESSAGE_room_id	room_id 		
+		
+					
+		app_name = "tasks"
+		<form action="{% url 'tasks:add' %}" method="post">
+
+
+login page review
+Django authentication wrapper
+log in required
+
+
+Django React integration 
+
+pages:
+	login
+	register
+	index
+	room
+	add friend
+
+
+routes:
+	get messages within a room
+		url(update_room) room_id
+		get
+		
+	get new messages count
+		per room, receive: time, last message, sender, unread messages 
+		url(update_all)
+		get
+		
+		[{room_id: ,room_name: ,unread_message_count: }, last_message:] <=sorted by time 
+		
+		rooms = user.chat_room.all <=filter by last update time
+			
+		for room in rooms:
+			last_message = room.messages.all().sort_by()
+			
+			{'room': room, 'last_message': {'time':, 'sender': ,'content': ,'unread_count: ';}}
+			
+			[{'room': ,'last_message': }, {'room': ,'last_message': },]
+			
+		for room in rooms:
+			last_message = room.messages.all() < get the most recent item
+			
+			copy = last_message.original_of.filter(user = request.user) 
+			
+			message in messages:
+				if message.original_of.filter(user = request.user).checked = false:
+					unread_count += 1
+				else:
+					break 
+					
+			
+		
+	send new messages to a group
+		url(send_message) room_id, content
+		post
+		
+	send a friend request
+		url(add_friend)
+		post
+		
+	send room creation request 
+		url(create_group)
+		post
+
+
+csrf
+
+review get, post, put methods
+	google copy html project 
+
+room and message sorting 
+time zone modification
+	break down into pieces for compatibility between python and js
+
+create a python file that simulates request from the client side
+	when a user first logs in, send a periodic not_in_room request just to update the number of unread messages
+		send entire chat room and message data
+	
+	every 5 seconds	
+		retrieve all unread messages
+		group them by room 
+			room sorting (the room with the most recent message on top)
+			user => room => messages
+			
+	periodic notification to the server when a user is in a room (if in a room)
+		url(/room_id/)
+		{current_room_id: 1}
+		update message checked state in the room 
+		
+		receives:
+			[{content:, time}]
+	
+	send message to a group request
+		url(/room_id?content='hello')
+		{content: "hello", room_id: 1}
+		
+	periodic request when not in a room	
+		url(/check/not_in_room)
+		
+		receives: 
+			[{room_id: ,room_name: ,unread_message_count: }, last_message:] <=sorted
+	
+	
+	request timing 
+		periodic
+			not_in_a_room	
+			in_a_room 
+		instant
+			send_message
+			logs_in
+			enters_a_room
+		 
+	request types:
+		not_in_a_room:
+			sends: url()
+				{user: Minkyu, in_room: False }
+			receives:
+				[{room_id: , room_name: , lates_message_content: , lates_message_time: , unread_message_count: }]
+				
+				[[{MessageCopy}, sender:, time, content: ]]
+				{MessageCopy} = {owner: ,is_checked: }
+		in_a_room:
+			sends: url()
+				{user: Minkyu, room_id: 1}
+			receives:
+				[[{MessageCopy}, sender:, time, content: ]]
+				{MessageCopy} = {owner: ,is_checked: }			
+			send_message: url()
+				sends:
+					{user: Minkyu, room_id: 1, message: }
+				receives (request for a new message right after):
+					same as 
+
+add additional people to a group 
+
+creat room only after first message is sent
+	client side: 
+		make a message mandatory when creating a room
+		keep an empty group only on the client side temporarily  
 checked = true for message sender
 add all functions as User methods 
 	add_friend, create_group, send_message, enter_room 	
 change "original_of" related name
 
-sending meesage to clients
+sending message to clients
 	original Message object AND its copy 
 
 looping through QuerySet, convert the set to a list
@@ -14,22 +198,21 @@ shell:
 	load chat_app.models
 	load functions from views.py
 
-
-
-run functions in view.py from python console
-
 open a group
 add people(friends)
 create a message 
 	only create room (or make the room appear to others) when a first message is sent
-	add boolean active field to the room
-	only query room with at least one message in a room
-	clinet only submits if a message is sent
-attach to a room and sender
-make copies of the message
-	link to the original message and recipients
+		client side: 
+			maka a message a mandatory field when creating a room
+			keep an empty group only on the client side temporarily 
+		add boolean active field to the room
+		only query rooms with at least one message in a room
+	clinet only submits if a message is not empty
+	attach to the room and sender
+	make copies of the message
+		link to the original message and members
 
-clinet:
+client:
 	logs in
 	add friends
 	open a group
@@ -37,19 +220,14 @@ clinet:
 	
 two pages (single page)
 	friends
-	chats 
-	room
-function add_friend(user)
+	chat roomm
 
-function create_group(name, users)
-
-function send_message(sender, group)
 
 
 
 review lecture note on custom User model setting
 
-inherit class attribute and set blank=true
+
 
 make friends symmetrical, but send a request first  
 
@@ -58,25 +236,28 @@ Class Meta.ordering
 
 Many_to_Many schecma <= join table 
 
-should the entire chat history retrieved everytime a user enter the group chat?
+should the entire chat history retrieved everytime a user enters a group chat?
+	client side:
+		based on the pk of the latest message
 
 review put method so that page does not have to be refreshed upon submission
 
-unread_count:
+unread_count(unread by # person/people):
 	new member joins so that the starting unread_count changes
+		a new member does not get access to previous messages, so the total number of copies of a message remains unchanged 
+		
 	create a new message for each recipient?
-		make an id_not_unique(or id_copies) attribute to group copies of every original message created for each recipient. id_not_unique should be equal to the pk of the original message 
+		make an id_not_unique(or id_copies) attribute to group copies of every original message created for each recipient. id_not_unique should be equal to the pk of the original message <= ForeignKey 
 		for every sent message, check the number of copies that have been read and report 
 			report the read number 
 
 	
 
-	message query timing
-		while a user is logged in 
+	message query timing (for each user, only if the user himself/herself is logged in)
 		every 5 seconds: 
-			user not in the room: only request for number of new messages. check for a new message (get method)
-			user present in the room: check for new messages AND update the read status (user last present attribute maybe) 
-		everytime a user enters the room: to update the read count (put method)
+			if the user is not in the room: only receieve number of new messages for each room. check for a new message via get method)
+			if the user is present in the room: check for new messages AND update the read status (user last present attribute maybe) 
+		everytime a user enters the room: update the read count via put method to avoid refreshing the page
 		
 			
 	read_by attributes
@@ -90,11 +271,7 @@ unread_count:
 			a new message object is created, total of three copies
 
 
-message(sender = A, id = 1, content='hi')
 
-message_copied(copy_of = 1, recipient = A, read = TRUE)
-message_copied(copy_of = 1, recipient = B, read = False)
-message_copied(copy_of = 1, recipient = C, read = False)
 
 
 then the message is added to the room, and the server notifies the members
@@ -104,37 +281,27 @@ then the message is added to the room, and the server notifies the members
 	A(sender): A is the sender so the most recent message is read. Client takes no further action
 		
 	B(receiver, not in the room): The server report the total count of unread messages that belongs to the group. And client displays the number 
+	
 	C(receiver, in the room): 
 
-		
-
-
-			the id of the original message is added to the room's model attribute 
+			the id of the original message is added to the room's attribute 
 				the unread_count should be 2 at this point
 			
 		
 		request sent from B and C for an update on new messages and the server responds
-			client notifies the server the id_copies of the most recent message it has downloaded 
+			client notifies the server the id_copies of the most recent message it has downloaded so that only new messages need to be sent 
 			
-			notify to the server the last message the client has so that only new messages from that point on need to be sent to the client, as opposed to sending the entire conversation history on the group chat. 
+			https://docs.djangoproject.com/en/3.2/ref/models/querysets/#range
+			notify the server the last message the client has so that only new messages from that point on need to be sent to the client, as opposed to sending the entire conversation history on the group chat. 
 			
 			the server queries new messages within the group chat and send the data to the client
 		
-		B enters the room, and for new messages,(checked until read message is reached), send to the servers the messages that have been newly checked 
-			client sends the id_copies of the most recent message is has downloaded
+
 		
 		
 		if there are more chats 
 
-purpose of room
-	1. quickly able to search for the chat room a user is engaged in
-	2. quickly query messages part of the chat room
 
-new member joins in a group chat
-	hide previous conversation from the new member 
-		filter by member join time, but not really necessary at this point 
-
-how MtoM is manifested as a Django model?
 
 url in django
 	how js files are referenced in layout.html 
@@ -142,19 +309,14 @@ url in django
 
 most recent chat move to the top
 
-	1. u1 adds u2, u3, u4 in a group chat 
-		room r1 created and added to u2, u3, and u4's room list
-
-	2. u1 sends a message to the group
-		m1 created
-	
-
 
 group chat 
 	database how
 	create a chat room hash key using the ID key of the users
 		make a unique ID by sorting in some order (ex. if there are three users with id 64, 4, 1005, then the chat room id would be room_4_64_1005 
 			hash table in sql database??
+		<=just used MtoM relationship between users and rooms (is it faster than just looking up for the hash key when retrieving data from the user?)
+			https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 
 Chatting application
 
@@ -189,7 +351,7 @@ chat query cases
 	case 3: sent and received
 
 	Duplicates 
-		for example there are 3 users, userA, userB, userC, userD
+		for example, there are 3 users, userA, userB, userC, userD
 		
 		case 3: between userA and userB
 		[(HI, ),( ,nice to meet you),(thanks for replying, )]
@@ -204,3 +366,33 @@ chat query cases
 		if (sender==userA AND receiver==userB) OR (serder==userB AND receiver==userA) 
 
 	what about group chat?
+	
+FINISHED:
+
+	function add_friend(user)
+
+	function create_group(name, users)
+
+	function send_message(sender, group)
+	
+	inherit model.User attribute and set username(blank=true)
+
+	purpose of room
+		1. quickly able to search for the chat room a user is a member of
+		2. quickly query messages that belong to the chat room
+
+	new member joins in a group chat
+		hide previous conversation from the new member 
+			filter by member join time, but not really necessary at this point 
+
+how MtoM is manifested as a Django model?
+
+	B enters the room, and for new messages,(checked until read message is reached), send the messages that have been newly checked to the server 
+		client sends the id_copies of the most recent message is has downloaded
+			just make all messages in the room read
+			
+message(sender = A, id = 1, content='hi')
+
+message_copied(copy_of = 1, recipient = A, read = TRUE)
+message_copied(copy_of = 1, recipient = B, read = False)
+message_copied(copy_of = 1, recipient = C, read = False)

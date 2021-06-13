@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
+from .model_methods import *
 
 # Create your models here.
 
@@ -26,6 +27,40 @@ class User(AbstractUser):
 	chat_room = models.ManyToManyField(Room, related_name = 
 	"members", blank = True)
 
+	def create_group(self, room_name, members):
+		room = Room(name = room_name)
+		room.save()
+		for member in members:
+			member.chat_room.add(room)
+		self.chat_room.add(room)
+	
+	def send_message(self, room, content):
+		message = Message(content = content, sender = self, room = room)
+		message.save()
+		members = room.members.all()
+		for member in members:
+			if member == self:
+				MessageCopy(original = message, owner = member, checked = True).save()
+			else:
+				MessageCopy(original = message, owner = member).save()
+		
+	def enter_room(self, room):
+		messages = Message.objects.filter(room = room)
+		for message in messages:
+			copies = MessageCopy.objects.filter(original = message, owner = self, checked = False)
+			for copy in copies:
+				copy.checked = True
+				copy.save()
+	
+	def update_all(self):
+		return update_all_method(self)
+		
+	def update_room(self, room):
+		return update_room_method(self, room) 
+		
+	def add_friend(self, friend):
+		add_friend_method(self, friend) 
+	
 	def __str__(self):
 		return f"{self.username}"
 	
