@@ -1,0 +1,87 @@
+body {
+    margin: auto;
+    max-width: 700px; 
+    height: 100vh;
+}
+
+.wrapper_main {
+    /* display: flex;  */
+    height: 70%;
+    overflow: auto;
+}
+
+.message_block {
+    display: flex;
+    width: 100%;
+    align-self: flex-end;
+    
+}
+
+.message {
+    max-width: 70%;
+    min-width: 15%;
+    display: inline-block;
+    /* border: 1px solid black;  */
+}
+
+.message > * {
+    word-wrap: break-word;
+
+}
+
+.message_self {
+    text-align: right;
+    margin: 0 0 0 auto;
+    /* float: right; */
+}
+
+.message_self > .content {
+    background-color: rgb(0, 132, 255);
+    color: white;
+}
+
+.message_other {
+    margin: 0 auto 0 0;
+}
+
+.message_other > .content {
+    background-color: #e4e6eb;
+}
+
+.space_filler {
+ margin: auto;
+}
+
+.content {
+    /* border: 1px solid black;  */
+    border-radius: 18px; 
+    padding: 0 0.8rem;
+}
+
+form {
+    /* display: flex;  */
+    margin-right: 0;
+}
+
+.button_container {
+    margin-left: 1rem;
+}
+
+/* .form_wrapper{
+    display: grid; 
+}
+
+.from_wrpper button{
+    width: 100px;
+} */
+
+.tempr {
+    max-width: 700px;
+    word-wrap: break-word;
+    /* display: flex;
+    flex-wrap: wrap; */
+}
+
+#submit_form input {
+    width: 100%;
+}

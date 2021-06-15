@@ -1,0 +1,23 @@
+body {
+	max-width: 700px; 
+}
+
+.user_info, .section_toggle {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	grid-template-rows: 5rem; 
+}
+
+.username, .section_friend {
+	grid-column: 1/7;
+	grid-row: 1;
+}
+
+.user_logout, .section_friend {
+	grid-column: 7:13;
+	grid-row: 1;
+}
+
+.friend, .group {
+	border: 1px solid black; 
+}

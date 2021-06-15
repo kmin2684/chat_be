@@ -1,3 +1,192 @@
+html
+	friends
+	chat groups
+	chat room
+	make a chat room page
+		more than 2 people selection
+		title submission 
+
+
+scroll to top to load more messages 
+
+style scrollbar 
+
+chat room
+	chats start from the bottom
+	scroolable 
+
+fix the form location 	
+
+time displayer(comparison, now) 
+	same year
+		day mon year
+	samd week
+		xxxday
+	same day 
+		xx:xx am
+	same hour 
+		just now
+
+apply csrf exemption for now
+
+onsubmit{
+	e.target.preventdefault()
+	temporarily update the sent message
+	send_message()
+
+}
+
+function send_message () {
+
+	{content: }
+
+	fetch(url, method: push)
+	.then(response => response.json())
+	.then((messages) => {
+		message_state = messages; 
+		})
+	.catch((error) => {
+	console.error(error.message);
+	delete the temporarily rendered sent message
+	})
+}
+
+function update_rooms() {
+	fetch(url)
+	.then(
+	
+	
+	[{room_id: ,room_name: , latest_message: ,unread_count: ,members: [user1, user2, user3] }]
+	
+}
+
+
+function update_friends() {
+	
+	[{username: ,chat_exits: T/F}]
+}
+
+function create_group() {
+	fetch(method: push, body:{members:[] ,content: }
+}
+
+function temp_room {
+	1. redirect to created room, new url
+	2. just change the state variable of the room 
+}
+
+page_create_group (
+add members, 
+new message)
+
+friend_checkbox (
+	for friend in friends
+		
+)
+
+
+function render_messages() {
+	for (message in messages) {
+		document.createelement('div')
+	
+	}
+}
+
+<div>
+	<div class = "content sent">
+		content
+	</div>
+	<div class = "others">
+		<div>
+			sender
+		</div>
+		<div>
+			time
+		</div>
+	</div>
+</div>
+
+
+function render_friends() {
+	
+}
+
+function render_rooms() {
+
+}
+
+if prev_stat === new_state
+	pass
+else 
+	prev_state = new_state
+	render(messages or friends or rooms) 
+
+
+
+
+successful request sends status 200
+
+prevent default 
+
+	send message
+		temporary sent message object on client side which gets replaced once messages are loaded from the server 
+	update new message in the server
+	retrieves unread messages from the server
+	mark retrieved messages read 
+
+	fetch(request).then(response ....).then(response...) 
+
+update friend list periodically 
+
+django template for js files 
+
+client state management
+	friends = [{friend_username: ,room_id: None if none,}]
+	room = {room_id: ,friend_usernames: ['1', '2'], messages: [sender: ,time_sent: ,content: ,unread_count: ]}
+
+
+possible hacks using JS console 
+	modify room id
+	modify friends list in a group 
+	always check if the rooms belong to the user sending requests 
+
+
+
+
+how to distinguish a new room from existing room 
+	server side check 
+		if a room exists between the two people, just add a new message to the group
+		otherwise, create a new group 
+
+when click a friend 
+	open a new chat group
+		if a message sent
+			update room state
+			
+			server side:
+				check if the room already exists
+				if its a new one, create a new group
+				add messages to the group
+				send back the room info and messages 
+		
+	or
+	open existing chat
+		for room in rooms
+			if room.members.len == 2
+				for member in members
+					if member = friend
+		or server sends the group title separately for each room 
+		or include as id 
+layout
+	chat_room
+		header: username, logout
+		tabs: friends, chats
+		list: div blocks 
+		
+
+
+get notification from client so that new messages are successfully updated 
+
 def update_a(update_all, a):
 	update_all(a)
 
@@ -64,7 +253,7 @@ pages:
 routes:
 	get messages within a room
 		url(update_room) room_id
-		get
+		get {room, user}
 		
 	get new messages count
 		per room, receive: time, last message, sender, unread messages 
