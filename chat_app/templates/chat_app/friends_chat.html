@@ -10,7 +10,9 @@
 
 	<link href="friends_chat.css" rel="stylesheet">
 
-    <title>Hello, world!</title>
+	<script src="friends_chat.js" defer></script>
+
+    <title>friends_chat</title>
   </head>
   
   <body>
@@ -23,7 +25,10 @@
 			log out
 		</div>
 	</div>
-	
+
+	<button>creat a new chat</button>
+
+	<br><br>
 	<div class = "vertical_list_friends"> 
 		<div class = "friend">
 			friend 1
@@ -33,14 +38,31 @@
 		</div>
 	</div>
 	
-	<div class = "vertical_list_groups" style="display: none;">
+	<br><br>
+
+	<div class = "vertical_list_groups">
 		<div class = 'group'>
-			group 1
+			<div class = 'group_title'>group 1</div>
+			<div class = 'message_preview'>
+				<div>latest message</div>
+				<div>&middot;</div>
+				<div>year-mon-dt</div>
+			</div>
 		</div>
 		<div class = 'group'>
-			group 2
+			<div class = 'group_title'>group 2</div>
+			<div class = 'message_preview'>
+				<div>latest message latest message latest message latest message latest message latest messagelatest messagelatest message</div><div>&middot;</div><div>year-mon-dt</div>
+			</div>
 		</div>
-		
+		<div class = 'group'>
+			<div class = 'group_title'>group 2</div>
+			<div class = 'message_preview'>
+				<div>latest message latest message latest message latest message latest message latest messagelatest messagelatest message</div>
+				<div>&middot;</div>
+				<div>year-mon-dt</div>
+			</div>
+		</div>
 	</div>
 	
 	
@@ -53,7 +75,35 @@
 		</div>
 	</div>
 	
-	
+	<div class = "hidden">
+		<br><br>
+		<div class = "vertical_list_friends select_members"> 
+			<div>
+				<span><button>back</button></span>
+				<span>Add participants</span>
+				<span><button>Next</button></span>
+			</div>
+			<div class = "friend">
+				friend 1
+				<span><input type="checkbox"></span>
+			</div>
+			<div class = "friend">
+				friend 2
+				<input type="checkbox">
+			</div>
+		</div>
+
+		<br><br>
+		<div>
+			<span><button>back</button></span>
+			<span>New Group</span>
+			<span><button>Create</button></span>
+		</div>
+		<div>
+			Name your new chat
+		</div>
+		<input type="text" placeholder="Group Name (Required)">
+	</div>
 	
 	
 

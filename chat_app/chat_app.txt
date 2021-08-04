@@ -1,11 +1,511 @@
+toggle between friend list and room list
+load chat window on clicking a message 
+close chat window on back button 
+
+
+start with JS or React?
+	HTML and CSS layout in JS
+		design in components like fashion 
+			</general>
+				</friends>
+				</rooms>
+			</conversation>
+			</create_new_group>
+				</add_members>
+				</add_title>
+	state management with React
+
+Channel_layer.groups
+	active members = [{user: ,current_room: }]
+	room1_active_members = []
+		this is required to identify to whom the server needs to send message via websocket the moment the server receives a message
+
+
+media query with react 
+	</App>
+		</general grid_left>
+			</main>
+				</friends>
+				</rooms>
+			</toggle>
+		</chat grid_right>
+
+	PC: 
+		enter room:
+			turn on </chat> (display: block)
+		
+		leave room:
+			turn off </chat> (display: block)
+
+		main view: empty window, chat
+		side view: friends, group
+		grid view
+
+		CSS
+			/app: grid
+			/general: grid_left
+			/chat: grid_right
+
+	mobile:
+		enter room:
+			turn on </chat> 
+				(display: block) or z index
+				fill in </chat> with contents
+			turn off </general> (display: none)
+			fill in </chat> with contents
+
+		leave room:
+			turn off </chat> (display: block)
+				remove children from contents
+			turn on </general> (display: none)
+
+		can i make SPA for mobile view even not when not restricted by PC mode consideration?
+
+		main view: friends, group, chats 
+
+		</general grid_left>
+			</main>
+				</friends>
+				</rooms>
+			</toggle>
+		</chat grid_right>
+
+		</chat> on </general> off and vice versa 
+
+	CSS
+		/app: block
+		/general: block/none
+		/chat: none/block
+
+	change the width of the side window
+
+	
+
+routing
+	it seems router works by choosing within <Switch>
+	in my case, component within switch contains link 
+		https://stackoverflow.com/questions/63709942/how-to-use-router-links-inside-switch?rq=1
+
+	routing for nested elements? can routing be applied on sibling components
+		</general>
+			</chat window>
+		
+		vs
+
+		</general>
+		</chat window>
+
+	<Router>
+		<div class="general">
+			<ul>
+				<li>
+
+				</li>
+			</ul>
+		<div>
+
+		<Link to="/">Home</Link>
+		<Switch>
+			<Route path="/about">
+				<About />
+			</Route>
+		</Switch>
+
+
+	</Router>
+
+
+	<Router>
+		<div class="general">
+			<div class = "rooms">
+				<Link to = "/room/1"> 
+					room1
+				</Link>
+				<Link to = "/room/2"> 
+					room2
+				</Link>
+			</div>
+			<div class = "friends">
+				<Link to = "/friend/1">
+					friend1
+				</Link>
+			</div>
+		</div>
+
+		<Switch>
+			<Route path="/room">
+				<Room />
+			</Route>
+			<Route path="/friend">
+				<friend />
+			</Route>
+		</Switch>
+	</Router>
+
+	switch within /chat components 
+	directly typing in url (ex. room/1) vs clicking on the general page
+		make a specifit response method on the server
+			same response as general case +
+			add the user to the room +
+			send message 
+		
+			maybe just redirect to /
+
+	Desktop version and url 
+		no problem at all 
+	routing is needed so that back button works
+	does SPA work like routing?
+		yes
+	what if a user's current_location changes by navigating forward and backward?
+		state management
+			<div class="room_id">.innerhtml.onchange = update_current_room("current_room")
+	creating a new group
+		general => add members => add title => load chat window => send a chat => send a request to the server for creating a new group => server register the room and the message to the database => send the room id and message to active users in th room => routing issue.... (simulate cliking action for entering room) => reload the room 
+
+
+websocket communication within group chat
+	joins a room
+		client
+			notifies server
+			receives messages 
+			renders messages
+		server
+			add the user to the group
+			change the read-count for all messages that hasn't been checked for the user
+			if read count has changed, sends messages to all members present in the group 
+	sends a messsage
+		client
+			notifies server
+			receives messages
+			renders messsages
+		server
+			add the message to the database
+				assign read-count to the message based on the number of people in the room
+				send the message to all active members in the room  
+	
+	leaves a room
+		cases
+			disconnected from web socket	
+				log out
+				close page
+			enter general view
+			joins another room 
+		remove the user from the channel_group for the room
+			keep track of current location of the user
+
+
+
+ 
+
+
+when a user sends messages...
+	sends message via web socket
+	server receives message
+	stores the message to the database
+		in the send messages method in models.py add additional parameters to select out those users who are present in the room, so that their read status can be checked at the moment of message copy creation
+
+unread message count 
+	user joins a room 
+	receives previous messages via html 
+	via web socket, add the user to the channel group and mark the join time
+		how to remove the user from the room once the user leaves the room?
+			when the user clicks the "X" button to leave the room, notify the server via websocket that the user has left the room.
+			how does routing work?
+
+		when a member in the group sends message, subtract the number of users present in the room from total number of members before pushing the message to active members in the room
+			when generating copies of the message, how do we mark the read status based on the active member?
+
+	mark all messages in the room as read for the user
+	if read status changes, notify all the active members of the changes in read status number count
+		resend all messages to active members with the change in unread count
+		OR
+		just notify the clients to reduce read count by one 
+
+implement these later
+	loading more chat when scrolling up 
+	unread message count
+	SPA
+
+
+overall state management schema 
+
+
+when entering a room for the first time, connect via html <= websocket because have to send updated read-count to all users 
+	general update with websocket connection established when a user first logs in
+		client receives...
+		{
+			group_id:
+			sender_id:
+			sender_name:
+			message:
+			time: 
+			unread_count: 
+		}
+	enters a room
+		receives all messages via html
+		if incoming message belongs to the room, append new messages 
+			current_messages = [
+				{
+					group_id:
+					sender_id:
+					sender_name:
+					message:
+					time:
+					unread count:
+				}
+			]
+
+			new_messages = [
+				{
+					group_id:
+					sender_id:
+					sender_name:
+					message:
+					time:
+					unread count:
+				}
+			]
+		render items in html format 
+
+new group vs existing group
+	new group
+		temp url
+		request url: create_group
+		request (websocket) <= maybe html ? 
+			{
+				group_name: none, 
+				members: [member1, member2], 
+				message: 'hi!'
+			}
+
+		server 
+			create a new group
+			add active members to the channel group for the room <= how?
+				url: 
+				if member in active_members
+					channel.group_add(group_id, member)
+		
+		response 
+			{
+				group_id: 8,
+				message: 'hi!
+			}
+
+	existing
+		request url: group/{group_id}
+		request
+			{
+
+			}
+
+checkbox
+	how to style
+	how to detect which ones are selected using javascript 
+
+firstly finish the project without websocket part. implement websocket in the last stage.
+	functionality first, then design 
+
+rerendering when state change
+	instead rerendering all chat html elements all over again, only change relevant part such as read status and new messages 
+
+updating read count via websocket (worry about read status later)
+	happen when a member enters a room 
+	from the database, check if the last message's read status is checked
+		if checked, no further action
+		else, 
+			loop through the messages and change the status to checked until encountering a checked message 
+			for every active member in the room, update the messages
+	
+
+establish web socket server
+
+
+websocket
+	connect
+		accept user and add the user's channel address for every group the user is part of
+	disconnect
+		remove user from all groups
+	receive
+		{
+			'room_id': '1', 
+			'content': 'hello', 
+		}
+			user.send_message(room_id, content)
+			channel.sendgroup('room-1', {'type': 'chat_messasge', 'content': 'hello'})
+	
+	chat_message(self, event):
+		message = event['message']
+		sender = event['sender']
+
+		self.sent(text_date=json.dumps({
+			'message': message, 
+			'sender': sender,
+			
+		}))
+	
+
+
+
+Client side state management
+	friends = [friend1, friend2, friend3, etc..]
+	chats = [
+		{
+			room: 'friend1', 
+			latest_message: 'hi!', 
+			time: 'xxxxxxxx',
+			unread_count: 5
+		},
+		{
+
+		}
+	]
+
+create  model based on the tutorial (X)
+	create models 
+	require login with decorator
+
+when a user logs in, add the user's channel name to every chat_group he belongs to 
+
+don't worry about SPA for now vs load each chat room as a div block 
+	can routing be done the way I made the SPA work for the email project? 
+	
+client notifies via websocket only when
+	sending message
+	reading message 
+
+
+
+how to send message to individual user?	
+
+channel name 
+	can consumers of different classes interact via channel name? i think so.... 
+
+chat scenario
+	case 1: A sends message and B is present in the room 
+	case 2: A sends a message and B is not in the group but online
+		server receives message
+		for each user in the room, check if the user is online 
+			if online
+
+			if the user is in the room, 
+			else 
+	
+
+
+
+consummer attributes
+	room_name
+	view_mode = PC or mobile 
+
+
+for general update, use for loop to add all the client's chat group in the channel layer group 
+	desktop mode: on the front end side, if the received messsage belongs to currently active chat, update
+	{desktop: location: desktop_vies: }
+	how to deal with desktop and mobile version just using front end? 
+		the server should know the client's whearabout to update the read-status
+			option 1: notify the server whenever message is checked after receiving
+				if incoming message does not belong to the current chat, ignore(if mobile)
+				else notify the server and mark all the messages read in the group for the user 
+			option 2: make two different versions, desktop and mobile versions, and whenever the viewport 
+			or active chat changes let the server know 
+
+make a mini channel project that does real time chat messaging
+
+how does the socket server manages session data set? user authentication? interact with database?  
+
+desktop view vs mobile view
+	for desktop simultaneous update on the current chat group and updates on other rooms
+		when changed to desktop mode, notify the server 
+		from the server side, treat desktop user and mobile user differently 
+		
+		online_user_general = []
+		online_user_group_11 = []
+
+
+real time update	
+	read status
+		when a use joins a room 
+			establish socket connection 
+			mark the messages read
+			push to other users the updated read status 
+	new message 
+
+Web socket usages
+	real time text conversation between users
+	for other rooms, update the number of unchecked messages and the latest message 
+		for all rooms, connect via socket
+			socket for each room or one socket for one user for general update? 
+
+make small projects that test react DRF Channel separately, especially DRF
+
+Django react usages
+	make a group
+		add a member
+		create a message
+
+	group: create, list
+	messages: create, list
+	users: create, list 
+
+
+React, Django, Django-rest, Channel, integration?
+
+Django DRF integration 
+	https://www.oddbird.net/2018/12/12/channels-and-drf/
+
+Django Channel 
+	https://blog.heroku.com/in_deep_with_django_channels_the_future_of_real_time_apps_in_django
+
+Django Channel boardgame example
+	https://blog.logrocket.com/django-channels-and-websockets/
+
+how to use router?
+
+how to use socket.io for updating new message in every room a user is part of 
+
+useref, useeffect 
+
+Django react integration 
+	https://www.digitalocean.com/community/tutorials/build-a-to-do-application-using-django-and-react
+
+sort copy by message like..
+	class Meta:
+    	ordering = ['user__username']
+
+4. self.request.user
+
+multi users accessing database simultaneously 
+client side routing
+web socket
+CORS
+authentication
+serializer api 
+
+Add back button 
+
+create a new room page
+	a new html file vs display switching
+
+empty room	
+	if group name is not blank
+		show on list of chats
+	else
+		don't show 
+
+multiple user accessing database at a same time, how to prevent these problems? 
+
+create a new room when a new friend is clicked on 
+send delete request when there is no message 
+
 html
 	friends
 	chat groups
 	chat room
-	make a chat room page
+	create a new chat room 
 		more than 2 people selection
 		title submission 
 
+new chat > new group chat (add more than 1 person) > add title
 
 scroll to top to load more messages 
 

@@ -1,0 +1,103 @@
+tutorial 4. authentication and permissions
+
+currently out api doesnt have any restirction on who can edit or delete code snippets. wed like to have some more advanced behavior in order to make tsure that
+code snippets are always associated with a creator 
+only authenticated users may create snippetsonlyt the creator of a snippet may update or dete itunauthenticated requests should have full read only access
+
+owner = models.foreinkey(auth.user, related)name=snippets, on_delete=models.cascade
+highlited = models.textfield
+
+wed also need to make sure that when the model is saved, that we populate the highlited field, using the pygments code highlight library
+
+well need some extre imports
+
+get lexer by namehtmlformatter
+highlight
+def save(self, *args, **kwards)"
+    use the ;'pygments library to create a highlighted html representation of the code snippet
+
+    lexer - get lexer by name(slef.langua=ge)
+    linenos
+    options
+    formatter
+
+
+    IN this case we;d like to use a hyperlinked style between entities. in order to do so, wi will modify our serializers to extend hyperlinkedmodelserializer instead of the existing modelsserializer
+    the hyperlinkedmodelsserialier has the following differences from modelsserializer
+    in does not include the id field by defaultin includes a url field, using hyperlinkedidentityfield
+    rlationsihps use hyperlinkedrelatedfield, instead of primarykeyrelatedfield
+
+    we can easily re-write our eisting serializers to use hyperliniking. in ou rnipppts/serializers.py add
+    class nippetserialier(serializers.hyperlinkedmodelserialier):
+        ownser - serializers.rewadonlyfield(*source-'owner.username'id_copies
+        )
+        highlight = serializers.hyperlinedidentityfield(view_name='snippet-highlight', format='html')
+
+            class meta:
+                model = snippet
+                fields = url id highlight owner title code linenos language style
+class userserializer(serializers.hyperlinkedmodelserializer)
+    nippets - serializers. hyperlinkedrelatedfield(many-true,view)name = snippet-detail, read)only-true)
+
+    class meta:
+        model - user
+        fiels - url id username snippets
+
+notice that weve also added a new highlight field. this field is of the sam etype as the url field, except that it points to the snippet-highlight url pattern instead of teh snippet detail url pattern 
+
+because weve included formate suffixed urls such as json we also need ot indicate on the highlight field that any format suffixed hyperlinks it returns shoudl use the .htnml suffix
+
+maing usre our url pattersnare named
+if we are going to have a hyperlinked api, we need to make wure ne name our url patterns. letstake a look at which url patterns we need to name. 
+
+    th root of our api refers to userlist and snippetlist
+    our snippet serializer includes a filed that refers to snippet-highlightour userserializer includes a filed that refers to snippet detail
+    our snipper and user serializer include url field that by defualt will refer to {model-name}-detail, which in this case will be snippet-detail and user-detail
+    after adding all thos names into our urlconf, our ffinal snippets/url.py file should look like this
+
+    from django.urls import path 
+    from rest-framework.urlpatterns import format_suffix_patterns
+    from snippets import view
+
+    api endpoints
+        urlpaterns = format-suffix_pattersn([path('',views.api_root),l ])
+            path(nippiets, vies,snippetlist.as_view, name- snippet-listpat(snippeits/int:pk views.anippetdetail.as_views()name =snipet-detail))
+
+            path users views.userlist.asviewname-userlistpath usersintpk views.userdetail.asviewnme=userdetail
+
+w ciykd aksi cystinuze tge oagubatuib style if we needed to, but in tthes case wewill jsut stick with teh defualt 
+
+browising the api
+if we open a brwoser and navigate 
+
+tutorial 6: viewsets and routers
+
+refactoring to useviewsets
+binding viewsets to urls explicitly
+using routerstrade-offs between views s viewsets
+
+
+rest framework includes an abstraction for dealing with viewsets, 
+
+viewset classes are almost the same thing as view2 classes, except that they provide operation susch as retreive or update and not method handlers such as 
+
+
+
+
+A ViewSet class is only bound to a set of method handlers at the last moment, when it is instantiated into a set of views, typically by using a Router class which handles the complexities of defining the URL conf for you.
+
+Refactoring to use ViewSets
+Let's take our current set of views, and refactor them into view sets.
+
+First of all let's refactor our UserList and UserDetail views into a single UserViewSet. We can remove the two views, and replace them with a single class:
+
+
+
+
+
+
+here weve used the readonlymodelviewset class to automatically provide the default read only operations. wea are still setting the queryset and serializer_calss attribu
+
+
+
+

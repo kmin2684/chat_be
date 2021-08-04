@@ -1,5 +1,6 @@
 body {
 	max-width: 700px; 
+	margin: auto; 
 }
 
 .user_info, .section_toggle {
@@ -14,10 +15,58 @@ body {
 }
 
 .user_logout, .section_friend {
-	grid-column: 7:13;
+	grid-column: 7/13;
 	grid-row: 1;
 }
 
 .friend, .group {
 	border: 1px solid black; 
+}
+
+.vertical_list_groups {
+	display: block;
+}
+
+.message_preview {
+	display: flex; 
+}
+
+/* .message_preview > span:nth-child(1) {
+	white-space:nowrap;
+	/* max-width: 70%; */
+	/* overflow: hidden;
+}
+
+.message_preview > span:nth-child(2) {
+	margin: 0 0.3rem;
+}
+
+.message_preview > span:nth-child(3) {
+	min-width: 6.5rem;
+} */ 
+
+
+.message_preview > div:nth-child(1) {
+	white-space:nowrap;
+	overflow: hidden;
+}
+
+.message_preview > div:nth-child(2) {
+	margin: 0 0.3rem;
+}
+
+.message_preview > div:nth-child(3) {
+	min-width: 6.5rem;
+}
+
+
+/* .message_preview > div:nth-child(1) {
+	white-space:nowrap;
+	max-width: 70%;
+	overflow: hidden;
+	display: inline;
+} */
+
+.hidden {
+	display: none;
 }

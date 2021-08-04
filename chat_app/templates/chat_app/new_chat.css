@@ -1,0 +1,41 @@
+body {
+    max-width: 700px;
+    margin: auto; 
+}
+
+.newchat_header {
+    display: flex; 
+}
+
+.newchat_header div:nth-child(1) {
+    margin: 0 0.5rem 0 0;
+}
+
+.friend {
+    width: 100%;
+    border: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+}
+
+hr {
+    color: blue;
+    height: 3px;
+    opacity: 1;
+
+}
+
+
+hr:not([size]) {
+    height: 3px;
+}
+
+.create {
+    position:relative;
+    width: 4rem;
+    left: calc(100% - 4rem); 
+}
+
+/* .friend input{
+    justify-self: end;
+} */

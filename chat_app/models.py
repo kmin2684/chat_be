@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from .model_methods import *
@@ -61,6 +62,15 @@ class User(AbstractUser):
 	def add_friend(self, friend):
 		add_friend_method(self, friend) 
 	
+	# def unread_message_counts(self, room_name):
+	# 	get all messages from the room in reverse chronological Order
+	# 	i = 0
+	# 	for message in messages:
+	# 		if message.MessageCopy.checked = true:
+	# 			return i
+	# 		else:
+	# 			i += 1 
+
 	def __str__(self):
 		return f"{self.username}"
 	
