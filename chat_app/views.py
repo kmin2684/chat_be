@@ -1,30 +1,28 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
 def index(request):
 	return HttpResponse("Hello, world!")			
-			
+		
 def login_view(request):
 	if request.method == "POST":
 
 		# Attempt to sign user in
-		username = request.POST["username"]
-		password = request.POST["password"]
+		username = request.POST.get('username')
+		password = request.POST.get('password')
 		user = authenticate(request, username=username, password=password)
 
 		# Check if authentication successful
 		if user is not None:
 			login(request, user)
-			return HttpResponseRedirect(reverse("index"))
+			return render(request, {"username": username})
 		else:
-			return render(request, "network/login.html", {
-				"message": "Invalid username and/or password."
-			})
-	else:
-		return render(request, "network/login.html")
+			return JsonResponse({"message": "invalid crendentials"})
+
 
 
 def logout_view(request):

@@ -1,3 +1,55 @@
+werializer formatting 
+	input argument to specify request owner
+	
+	room [id, title, users, last_message]
+	friends [user1, u]
+	user [id, username]
+
+	how to put additional input argument to serializer
+	how to put access current from serializer class 
+
+	how to include fields from different models in serializers
+		in this case, how to validate incoming data?
+
+
+view login	
+	if user is already logged in 
+		send user information in json 
+	if authentication valid
+		send user information
+	if authentication invalid
+		send error message 
+
+
+session based login might work
+
+DRF Channels token authentication 
+	https://stackoverflow.com/questions/4361173/http-headers-in-websockets-client-api/4361358#4361358
+	https://stackoverflow.com/questions/43392889/how-do-you-authenticate-a-websocket-with-token-authentication-on-django-channels
+	https://stackoverflow.com/questions/56671283/how-do-you-authenticate-a-websocket-connection-with-knox-token-authentication-on
+
+input from router url 
+
+change content based on viewport size (width)
+	useeffect
+
+powershell environment path problem 
+	https://stackoverflow.com/questions/546583/why-is-the-powershell-environment-path-different-to-the-system-environment-path
+
+do i need to use useeffect
+	web socket connection 
+how changing chatbox content work?
+
+mdn react review
+lama dev
+conversation onclick useeffect
+
+url for new chat 
+
+possible problems with spa
+add back and next button to new group form 
+	instead eventlistener on back button, refresh new chat name and group state everytime loading a chat room or general area 
+
 toggle between friend list and room list
 load chat window on clicking a message 
 close chat window on back button 
@@ -29,6 +81,10 @@ media query with react
 				</rooms>
 			</toggle>
 		</chat grid_right>
+
+	can I only mount one of the </general> and </chat> component on mobile mode and mount both on pc?
+		just use CSS property "display" and change view mode based on the window width
+
 
 	PC: 
 		enter room:
@@ -72,19 +128,101 @@ media query with react
 
 		</chat> on </general> off and vice versa 
 
-	CSS
-		/app: block
-		/general: block/none
-		/chat: none/block
+		CSS
+			/app: block
+			/general: block/none
+			/chat: none/block
 
 	change the width of the side window
 
 	
 
 routing
+
+	</new chat form> has its own state management so that state refreshes navigating back and forth and the components remount
+		</newchatform> has 4 views (select friends=> add group members=> add title=> temp_conversation)
+		temp conversation page	
+			redirect to </conversation>?
+			submit message => receive new room info from server => client side redirection to /room (</conversation>)
+				if there is no other way, I can just hide a <Link> and simulate clicking by JS
+
+	prevent going back to new chat form from new chat room 
+		do not change url for loading new chat form 
+		force to always go to the general page 
+			push state when joining the room 
+			remove state when leaving the new chat form 
+	links
+		/
+		/room
+		/room/1
+		/new_message
+			/new_message/add_participants
+			/new_message/add_participants/add_title
+			/new_room
+
+	/new_message containes 3 components
+		</room>
+		</add_participants>
+		</add_title>
+
+
+	test by directly typing in url and see if the client sends a request to the server
+	routing is needed to maintain websocket connection when changing url 
+	routing is not just about chainging css display setting. it works by mounting and unmounting components where as changing display setting still keeps all the components in the DOM.
+		user props to send which view to turn on
+			then things have to mount and unmount everytime...?
+
+	layout
+		<div className = "view1">
+			<friends>
+			<rooms>
+			<toggle_bar>
+		</div>
+		<div className = "view2">
+			<new_chat_form>
+			<conversation>
+		</div>
+
+	<Router>
+		<Switch>
+			<Route exact path="/">
+				<div className = "view1">
+					<friends>
+					<rooms>
+					<toggle_bar>
+				</div>
+				<div className = "view2">
+					<new_chat_form>
+					<conversation>
+				</div>
+			</Route>
+			<Route path = "/room">
+				<div className = "view1">
+					<friends>
+					<rooms>
+					<toggle_bar>
+				</div>
+				<div className = "view2">
+					<conversation>
+			</Route>
+			<Route path = "/new_chat">
+				<div className = "view1">
+					<friends>
+					<rooms>
+					<toggle_bar>
+				</div>
+				<div className = "view2">
+					<new_chat_form>
+			</Route>
+		</Swtich>
+	</Router>
+
+
+	https://stackoverflow.com/questions/27928372/react-router-urls-dont-work-when-refreshing-or-writing-manually
 	it seems router works by choosing within <Switch>
 	in my case, component within switch contains link 
 		https://stackoverflow.com/questions/63709942/how-to-use-router-links-inside-switch?rq=1
+		https://www.taniarascia.com/using-react-router-spa/
 
 	routing for nested elements? can routing be applied on sibling components
 		</general>
@@ -162,6 +300,8 @@ routing
 	creating a new group
 		general => add members => add title => load chat window => send a chat => send a request to the server for creating a new group => server register the room and the message to the database => send the room id and message to active users in th room => routing issue.... (simulate cliking action for entering room) => reload the room 
 
+	SPA
+		https://stackoverflow.com/questions/25806608/how-to-detect-browser-back-button-event-cross-browser
 
 websocket communication within group chat
 	joins a room

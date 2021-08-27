@@ -5,6 +5,9 @@
         },
         {
             "path": "..\\..\\channel_tutorial\\mysite"
+        },
+        {
+            "path": "..\\chat_fe"
         }
     ]
 }
