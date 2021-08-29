@@ -3,6 +3,69 @@ from django.http import HttpResponse, JsonResponse
 from .models import *
 from django.views.decorators.csrf import csrf_exempt
 
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+# def registration(request):
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        print(serializer.validated_data['user'])
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'username': user.username,
+            # 'email': user.email
+        })
+
+class Logout(APIView):
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+def user_check(request):
+	print(request.user)
+	return Response({'username': request.user.username})
+	# return JsonResponse({'username': 'none'})
+
+@api_view(['POST'])
+def registration(request):
+	username = request.POST.get('username')
+	password = request.POST.get('password')
+	password2 = request.POST.get('password2')
+	
+	if len(password) > 0 and password != password2:
+		return JsonResponse({"error": "passwords either empty and/or don't match"})
+	
+	try:
+		user = User.objects.create(
+			username = username,
+		)
+		user.set_password(password)
+		user.save()
+	except:
+		return JsonResponse({"error": "failed to register the user"})
+
+	token, created = Token.objects.get_or_create(user=user)
+	return JsonResponse({'token': token.key, 'username': user.username})
+
+
 # Create your views here.
 
 def index(request):

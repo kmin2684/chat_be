@@ -1,8 +1,11 @@
-werializer formatting 
+implement logout
+make registration page 
+
+serializer formatting 
 	input argument to specify request owner
 	
 	room [id, title, users, last_message]
-	friends [user1, u]
+	friends [user1, user2]
 	user [id, username]
 
 	how to put additional input argument to serializer
@@ -24,6 +27,8 @@ view login
 session based login might work
 
 DRF Channels token authentication 
+	logout https://stackoverflow.com/questions/30739352/django-rest-framework-token-authentication-logout
+	https://www.youtube.com/watch?v=5_hLC1QC_Vc
 	https://stackoverflow.com/questions/4361173/http-headers-in-websockets-client-api/4361358#4361358
 	https://stackoverflow.com/questions/43392889/how-do-you-authenticate-a-websocket-with-token-authentication-on-django-channels
 	https://stackoverflow.com/questions/56671283/how-do-you-authenticate-a-websocket-connection-with-knox-token-authentication-on
