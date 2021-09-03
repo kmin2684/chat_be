@@ -1,3 +1,41 @@
+receiving a new message from a newly created chat room 
+	incoming via websocket 
+	check if the message is from newly created room 
+	update the current room state list
+
+
+creating a new chat 
+	send new message via web socket
+	{memebers, chat_name, is_new_room, message}
+	redirect to the room if successful 
+	if is_new_room and message.sender == current user
+		redirect to the room 
+
+
+websocket 
+	add authentication middleware 
+	check database interaction
+		try retrieving data
+			get last message from the database
+	
+	group_add(logged_in_users)
+	receive a message => add to the data base => find members that are logged in => send messages to active users in the room
+	what channel group should i make? 
+		logged_in_users vs every chat room 
+		every chat room
+			for every member in the chat room, get the channel name of logged in users
+			edge cases	
+				new room created
+				leave a room 
+		how to know if a user is logged in <= see if token exists
+	
+	receive message
+		{room_id message}
+	
+	send message	
+		{room_id message is_new_room}
+
+
 implement logout
 make registration page 
 
@@ -27,6 +65,7 @@ view login
 session based login might work
 
 DRF Channels token authentication 
+	registration https://medium.com/django-rest/django-rest-framework-login-and-register-user-fd91cf6029d5
 	logout https://stackoverflow.com/questions/30739352/django-rest-framework-token-authentication-logout
 	https://www.youtube.com/watch?v=5_hLC1QC_Vc
 	https://stackoverflow.com/questions/4361173/http-headers-in-websockets-client-api/4361358#4361358
