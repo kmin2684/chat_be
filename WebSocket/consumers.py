@@ -90,12 +90,13 @@ class ChatConsumer(WebsocketConsumer):
                 print("\n the room does not exist \n")
                 roomId = 'N/A'
 
+        saved_message = token.user.send_message(room=room, content=message)
+
         for room_member in room_members:
             try:
                 print("\n\n\ngroup name:", self.scope["user"].username,
                       ", username: ", Token.objects.get(user=room_member).user.username)
-                saved_message = token.user.send_message(
-                    room=room, content=message)
+
                 async_to_sync(self.channel_layer.group_send)(
                     Token.objects.get(user=room_member).user.username,
                     {

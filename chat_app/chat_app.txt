@@ -24,6 +24,7 @@ time zone conversion
 	Intl.DateTimeFormat().resolvedOptions().timeZone
 	https://stackoverflow.com/questions/10087819/convert-date-to-another-timezone-in-javascript
 	https://stackoverflow.com/questions/1091372/getting-the-clients-time-zone-and-offset-in-javascript
+	stringfy https://stackoverflow.com/questions/455580/json-datetime-between-python-and-javascript
 
 json data
 	try sending and receiving message 
