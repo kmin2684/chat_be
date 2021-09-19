@@ -10,6 +10,12 @@ urlpatterns = [
 	# path("logout", views.logout_view, name="logout"),
 	# path("register", views.register, name="register"),
 	
+	path('room_create', views.room_create),
+	path('json_check', views.json_check),
+	path('datetime', views.datetime_test),
+	path('general_update', views.general_update),
+	path('chat_update/<int:room_id>', views.room_update),
+
 	path('api-token-auth/', CustomAuthToken.as_view()),
 
 	path('user_check', views.user_check),

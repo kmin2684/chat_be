@@ -1,3 +1,4 @@
+from types import MemberDescriptorType
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import *
@@ -9,14 +10,82 @@ from rest_framework.response import Response
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SingleOperandHolder
+import json
+import datetime
 
 # def registration(request):
 
-class CustomAuthToken(ObtainAuthToken):
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def room_create(request):
+	data = json.loads(request.body)
+	print(data.get('members'))
+	print(type(data.get('members')))
+	members = [User.objects.get(username = member) for member in data.get('members')]
+	room_name = data.get('name')
+	content = data.get('content')
+	room = request.user.create_group(room_name = room_name, members = members, content = content)
+	return Response(room)
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def room_update(request, room_id):
+	room = request.user.chat_room.get(id=room_id)
+	if request.method == 'GET':
+		return Response(room.serialize(mode='detail', user=request.user))
+	elif request.method == 'POST':
+		data=json.loads(request.body)
+		content = data.get("content")
+		# print('\n\nroom_update\n\n')
+		# print(request.POST)
+		if content:
+			return Response({'sent': request.user.send_message(room=room, content=content)})
+		pass
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def general_update(request):
+	friends = request.user.friends.all().order_by('username')
+	rooms = request.user.chat_room.all().order_by()
+
+	return Response({
+		'friends': [friend.username for friend in friends],
+		'rooms': [room.serialize(mode='brief', user=request.user) for room in rooms],
+		}) 
+
+def message_test(request):
+	if request.method == 'GET':
+		mode = request.GET.get('mode')
+	pass
+
+def datetime_test(request):
+	return JsonResponse({'current_UTC_time': datetime.datetime.now()})
+
+@api_view(['POST'])
+def json_check(request):
+	# list_item = request.POST.get('list_item')
+	# bool_item = request.POST.get('bool_item')
+	data = json.loads(request.body)
+	list_item = data.get('list_item')
+	bool_item = data.get('bool_item')
+	print('\n\n', list_item, type(list_item), list(list_item), '\n', bool_item, type(bool_item), bool(bool_item), '\n\n')
+	return Response({'message': 'json check success'})
+
+api_view(['POST'])
+def CreateNewRoom(request):
+	data = json.loads(request.body)
+	# room_name
+	# members
+	# message
+	# sender
+	# create new room
+	# create new message and link it to the new room
+
+class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})

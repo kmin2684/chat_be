@@ -1,14 +1,72 @@
+CORS
+	https://web.dev/cross-origin-resource-sharing/
+	https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i#:~:text=Why%20doesn%27t%20Postman%20implement,so%20CORS%20does%20not%20apply.
+
+make login, registration, logout page
+console log fetched data 
+
+get rooms
+get users
+get messages in a room
+
+read_by feature:
+	in the consumer keep track of user's current location 
+
+make api for 
+	get friends
+	get rooms
+	get messages
+
+	send message
+	make a new room
+
+time zone conversion
+	Intl.DateTimeFormat().resolvedOptions().timeZone
+	https://stackoverflow.com/questions/10087819/convert-date-to-another-timezone-in-javascript
+	https://stackoverflow.com/questions/1091372/getting-the-clients-time-zone-and-offset-in-javascript
+
+json data
+	try sending and receiving message 
+
+	message = {
+		sender
+		content
+		room_id
+		time
+	}
+
+	room = {
+		id
+		name
+		members: ['user1', 'user2', etc]
+		messages: [message1, message2, message3]
+		unread_message_exists: 
+	}
+
+	user = {
+		username
+	}
+
+
+
+try sending list and boolean value over http and see how python interprets them
+
 receiving a new message from a newly created chat room 
 	incoming via websocket 
 	check if the message is from newly created room 
 	update the current room state list
+	
+	for sender do http request and response to make it more efficient
+		but other members can't receive the message via web socket 
+
 
 
 creating a new chat 
 	send new message via web socket
 	{memebers, chat_name, is_new_room, message}
 	redirect to the room if successful 
-	if is_new_room and message.sender == current user
+	if is_new_room and message.sender == current user && route='newchat' 
+		use state (redirect_ready=true) to check condition for redirect 
 		redirect to the room 
 
 

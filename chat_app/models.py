@@ -8,8 +8,36 @@ from .model_methods import *
 class Room(models.Model):
 	name = models.CharField(max_length=255)
 	
+	# def last_message(self, username):
+	def serialize(self, user, mode):
+		messages = self.messages.all().order_by('time_sent')
+		members = self.members.all()
+		if mode == 'brief':
+			if len(messages) > 0:
+				last_message = messages[len(messages)-1]
+				last_message = {
+					'time': last_message.time_sent,
+					'content': last_message.content,
+					'checked': last_message.original_of.get(owner=user).checked,
+				}
+			else:
+				last_message = None
+			return {
+				'id': self.id,
+				'name': self.name,
+				'members': [member.username for member in members],
+				'last_message': last_message,
+			}
+		elif mode == 'detail':
+			return {
+				'id': self.id,
+				'name': self.name,
+				'members': [member.username for member in members],
+				'messages': [message.serialize() for message in messages],
+			}
+
 	def __str__(self):
-		return f"{self.name}"
+		return f"name: {self.name}, id: {self.id}"
 
 # class User(AbstractBaseUser):
 	# email = models.EmailField(max_length=60, blank = True)
@@ -25,15 +53,16 @@ class User(AbstractUser):
 	first_name = models.CharField(max_length=40, blank = True)
 	last_name = models.CharField(max_length=40, blank = True)
 	friends = models.ManyToManyField("self", blank = True)
-	chat_room = models.ManyToManyField(Room, related_name = 
-	"members", blank = True)
+	chat_room = models.ManyToManyField(Room, related_name ="members", blank = True)
 
-	def create_group(self, room_name, members):
+	def create_group(self, room_name, members, content):
 		room = Room(name = room_name)
 		room.save()
 		for member in members:
 			member.chat_room.add(room)
 		self.chat_room.add(room)
+		self.send_message(room = room, content = content)
+		return room.serialize(user = self, mode = 'detail')
 	
 	def send_message(self, room, content):
 		message = Message(content = content, sender = self, room = room)
@@ -44,6 +73,7 @@ class User(AbstractUser):
 				MessageCopy(original = message, owner = member, checked = True).save()
 			else:
 				MessageCopy(original = message, owner = member).save()
+		return message.serialize()
 		
 	def enter_room(self, room):
 		messages = Message.objects.filter(room = room)
@@ -80,8 +110,16 @@ class Message(models.Model):
 	time_sent = models.DateTimeField(auto_now_add = True)
 	room = models.ForeignKey(Room, models.SET_NULL, null = True, related_name = "messages")
 	
+	def serialize(self):
+		return {
+			'content': self.content,
+			'sender': self.sender.username,
+			'time': self.time_sent,
+			'room_id': self.room.id, 
+		}
+
 	def __str__(self):
-		return f"{self.content}, sender: {self.sender.username}"
+		return f"contnet: {self.content}, sender: {self.sender.username}, time: {self.time_sent}"
 	
 
 class MessageCopy(models.Model):
@@ -94,4 +132,3 @@ class MessageCopy(models.Model):
 		
 	def __str__(self):
 		return f"{self.original.content}, sender: {self.original.sender.username}, ownder: {self.owner.username}, checked: {self.checked}"
-
