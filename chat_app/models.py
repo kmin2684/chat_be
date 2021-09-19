@@ -77,7 +77,7 @@ class User(AbstractUser):
                             checked=True).save()
             else:
                 MessageCopy(original=message, owner=member).save()
-        return message.serialize()
+        return message
 
     def enter_room(self, room):
         messages = Message.objects.filter(room=room)

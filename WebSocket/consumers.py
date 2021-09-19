@@ -54,7 +54,8 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        room = 'N/A'
+        roomId = 'N/A'
+        room = None
         room_members = []
         # print(message, text_data_json['is_new_chat'])
         # check if the user is still logged in
@@ -80,14 +81,36 @@ class ChatConsumer(WebsocketConsumer):
                 room_members = room.members.all()
                 if token.user in room_members:
                     # room = room.serialize(user=token.user, mode='brief')
-                    room = room.id
+                    roomId = room.id
                     # print(room)
                 else:
                     print("\n\nthe user does not belong in the room\n\n")
-                    room = 'N/A'
+                    roomId = 'N/A'
             except:
                 print("\n the room does not exist \n")
-                room = 'N/A'
+                roomId = 'N/A'
+
+        for room_member in room_members:
+            try:
+                print("\n\n\ngroup name:", self.scope["user"].username,
+                      ", username: ", Token.objects.get(user=room_member).user.username)
+                saved_message = token.user.send_message(
+                    room=room, content=message)
+                async_to_sync(self.channel_layer.group_send)(
+                    Token.objects.get(user=room_member).user.username,
+                    {
+                        'type': 'chat_message',
+                        'message': saved_message.serialize(),
+                        # 'username': self.scope["user"].username,
+                        'sender': token.user.username,
+                        'roomId': roomId
+                    }
+                )
+                print('sent to: ', Token.objects.get(
+                    user=room_member).user.username, "\n\n\n")
+            except Exception as e:
+                print("\n\nError in line 94: ", e, "\n")
+                pass
 
     # Send message to room group
         # async_to_sync(self.channel_layer.group_send)(
@@ -101,45 +124,24 @@ class ChatConsumer(WebsocketConsumer):
         #     }
         # )
 
-        for room_member in room_members:
-            try:
-                print("\n\n\ngroup name:", self.scope["user"].username,
-                      ", username: ", Token.objects.get(user=room_member).user.username)
-                async_to_sync(self.channel_layer.group_send)(
-                    Token.objects.get(user=room_member).user.username,
-                    {
-                        'type': 'chat_message',
-                        'message': message,
-                        # 'username': self.scope["user"].username,
-                        'sender': token.user.username,
-                        'room': room
-                    }
-                )
-                print('sent to: ', Token.objects.get(
-                    user=room_member).user.username, "\n\n\n")
-            except Exception as e:
-                print("\n\nError line 104: ", e, "\n")
-                pass
-
     # Receive message from room group
 
     def chat_message(self, event):
         message = event['message']
         sender = event['sender']
-        room = event['room']
+        room = event['roomId']
         # token = event['token']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
             'sender': sender,
-            'room': room,
+            'roomId': room,
             # 'token': token,
         }))
 
     # a new message from a new chat room
     def new_room_message(self, event):
-
         self.send(text_data=json.dumps({
             # if the client is sender and the room_id is new, redirect to the Room
             'type': 'new chat',
