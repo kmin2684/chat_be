@@ -74,7 +74,9 @@ class ChatConsumer(WebsocketConsumer):
             try:
                 room = Room.objects.get(id=text_data_json['room_id'])
                 if token.user in room.members.all():
-                    print(room)
+                    room = room.serialize(user=token.user, mode='brief')
+                    # room = room.id
+                    # print(room)
                 else:
                     print("\n\nthe user does not belong in the room\n\n")
                     room = 'N/A'
@@ -90,7 +92,7 @@ class ChatConsumer(WebsocketConsumer):
                 'message': message,
                 # 'username': self.scope["user"].username,
                 'sender': token.user.username,
-                'room': room.id
+                'room': room
             }
         )
 
