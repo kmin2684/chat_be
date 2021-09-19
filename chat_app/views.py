@@ -46,7 +46,9 @@ def room_update(request, room_id):
         # print('\n\nroom_update\n\n')
         # print(request.POST)
         if content:
-            return Response({'sent': request.user.send_message(room=room, content=content)})
+            # return Response({'sent': request.user.send_message(room=room, content=content).serialize()})
+            sentMessage = request.user.send_message(room=room, content=content)
+            return Response({'sent': sentMessage.serialize()})
         pass
 
 
