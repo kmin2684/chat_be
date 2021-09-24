@@ -1,3 +1,6 @@
+socket
+	send to users connected to web socket, not logged in 
+
 CORS
 	https://web.dev/cross-origin-resource-sharing/
 	https://stackoverflow.com/questions/20035101/why-does-my-javascript-code-receive-a-no-access-control-allow-origin-header-i#:~:text=Why%20doesn%27t%20Postman%20implement,so%20CORS%20does%20not%20apply.
