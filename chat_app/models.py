@@ -65,7 +65,8 @@ class User(AbstractUser):
             member.chat_room.add(room)
         self.chat_room.add(room)
         self.send_message(room=room, content=content)
-        return room.serialize(user=self, mode='detail')
+        return room
+        # return room.serialize(user=self, mode='detail')
 
     def send_message(self, room, content):
         message = Message(content=content, sender=self, room=room)

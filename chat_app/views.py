@@ -62,7 +62,7 @@ def room_create(request):
     content = data.get('content')
     room = request.user.create_group(
         room_name=room_name, members=members, content=content)
-    return Response(room)
+    return Response(room.serialize(user=self, mode='detail'))
 
 
 @api_view(['GET', 'POST'])

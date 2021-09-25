@@ -56,7 +56,10 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
         roomId = 'N/A'
         room = None
+        members = None
+        saved_message = None
         room_members = []
+        newChat = False
         # print(message, text_data_json['is_new_chat'])
         # check if the user is still logged in
         try:
@@ -67,21 +70,47 @@ class ChatConsumer(WebsocketConsumer):
             print('disconnected')
             return
 
-        if 'is_new chat' in text_data_json.keys():
-            if text_data_json['is_new_chat'] == 'true':
+        if 'newChat' in text_data_json.keys():
+            if text_data_json['newChat']:
                 members = text_data_json['members']
-                group_name = text_data_json['group name']
-                pass
+                groupName = text_data_json['groupName']
+                for member in members:
+                    try:
+                        room_members += User.objects.get(username=member)
+                    except:
+                        print('\n new chat error', Exception)
 
+                if len(room_members) > 1:
+                    room = token.user.create_group(
+                        room_name=groupName, members=room_members, content=message)
+                    saved_message = room.messages.all()[0]
+                    async_to_sync(self.channel_layer.group_send)(
+                        token.user.username,
+                        {
+                            'type': 'new_room',
+                            'message': saved_message.serialize(),
+                            'sender': token.user.username,
+                            'roomId': room.id
+                        }
+                    )
+#   const newChatData = {
+#     newChat: true,
+#     groupName,
+#     members: checkedUsers,
+
+#   };
+    # def create_group(self, room_name, members, content):
         # message = text_data_json['message']
 
-        if 'room_id' in text_data_json.keys():
+        elif 'room_id' in text_data_json.keys():
             try:
                 room = Room.objects.get(id=text_data_json['room_id'])
                 room_members = room.members.all()
                 if token.user in room_members:
                     # room = room.serialize(user=token.user, mode='brief')
                     roomId = room.id
+                    saved_message = token.user.send_message(
+                        room=room, content=message)
                     # print(room)
                 else:
                     print("\n\nthe user does not belong in the room\n\n")
@@ -90,13 +119,10 @@ class ChatConsumer(WebsocketConsumer):
                 print("\n the room does not exist \n")
                 roomId = 'N/A'
 
-        saved_message = token.user.send_message(room=room, content=message)
-
         for room_member in room_members:
             try:
                 print("\n\n\ngroup name:", self.scope["user"].username,
                       ", username: ", Token.objects.get(user=room_member).user.username)
-
                 async_to_sync(self.channel_layer.group_send)(
                     Token.objects.get(user=room_member).user.username,
                     {
@@ -142,13 +168,17 @@ class ChatConsumer(WebsocketConsumer):
         }))
 
     # a new message from a new chat room
-    def new_room_message(self, event):
+    # room_id, message, sender not required
+    def new_room(self, event):
+        message = event['message']
+        sender = event['sender']
+        room = event['roomId']
         self.send(text_data=json.dumps({
             # if the client is sender and the room_id is new, redirect to the Room
-            'type': 'new chat',
-            # 'sender': sender,
-            # 'message': message,
-            # 'room-id': room_id,
+            'newChat': True,
+            'sender': sender,
+            'message': message,
+            'roomId': room,
         }))
 
 # def login_check(token_key):
