@@ -64,7 +64,7 @@ class ChatConsumer(WebsocketConsumer):
         try:
             token = Token.objects.get(key=self.token_key)
         except Token.DoesNotExist:
-            print("\n\n\n token does not exist \n\n\n")
+            print("\n received via socket: token does not exist \n")
             self.disconnect(close_code=None)
             print('disconnected')
             return
@@ -72,7 +72,7 @@ class ChatConsumer(WebsocketConsumer):
         if 'newChat' in text_data_json.keys():
             if text_data_json['newChat']:
                 members = text_data_json['members']
-                groupName = text_data_json['groupName']
+                groupName = text_data_json['groupName'].strip()
                 # print(members, type(members))
                 # print(User.objects.get(username=members[0]))
                 for member in members:
@@ -81,7 +81,15 @@ class ChatConsumer(WebsocketConsumer):
                     except Exception as e:
                         print('\n new chat error:', e)
 
-                if len(room_members) > 1:
+                if len(room_members) > 1 and not groupName:
+                    print('\n no group name was provided for the group chat\n')
+                    self.send('no group name was provided for the group chat')
+                    return
+                elif not room_members:
+                    print('\n not enought members to create a new chat\n')
+                    self.send('not enought members to create a new chat')
+                    return
+                else:
                     room = token.user.create_group(
                         room_name=groupName, members=room_members, content=message)
                     saved_message = room.messages.all()[0]
@@ -97,8 +105,11 @@ class ChatConsumer(WebsocketConsumer):
                     )
                     for room_member in room_members:
                         try:
-                            print("\n\n\ngroup name:", self.scope["user"].username,
-                                  ", username: ", Token.objects.get(user=room_member).user.username)
+                            # print("\n\n\ngroup name:", self.scope["user"].username,
+                            #       ", username: ", Token.objects.get(user=room_member).user.username)
+                            print(
+                                f'\n group name: {self.scope["user"].username} \n username: {Token.objects.get(user=room_member).user.username}\n')
+
                             username = Token.objects.get(
                                 user=room_member).user.username
                             async_to_sync(self.channel_layer.group_send)(
@@ -111,14 +122,12 @@ class ChatConsumer(WebsocketConsumer):
                                     'room': room.serialize(user=room_member, mode='brief')
                                 }
                             )
-                            print('sent to: ', Token.objects.get(
-                                user=room_member).user.username, "\n\n\n")
+                            print(
+                                f'\n sent to: {Token.objects.get(user=room_member).user.username}\n')
                         except Exception as e:
                             print(
-                                f"\n\nError in newchat channe_layer.group_send: {e} \n")
-                            pass
-                else:
-                    print("\n not enough members to create a new group chat \n")
+                                f"\n Error in newchat channe_layer.group_send, member: \n {room_member} \n{e}\n")
+
 #   const newChatData = {
 #     newChat: true,
 #     groupName,

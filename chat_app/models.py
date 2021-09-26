@@ -114,9 +114,9 @@ class User(AbstractUser):
 class Message(models.Model):
     content = models.TextField()
     sender = models.ForeignKey(
-        User, models.SET_NULL, null=True, related_name="sender_of")
+        User, on_delete=models.SET_NULL, null=True, related_name="sender_of")
     time_sent = models.DateTimeField(auto_now_add=True)
-    room = models.ForeignKey(Room, models.SET_NULL,
+    room = models.ForeignKey(Room, on_delete=models.CASCADE,
                              null=True, related_name="messages")
 
     def serialize(self):
