@@ -1,3 +1,7 @@
+deployment
+	wss error:
+		https://stackoverflow.com/questions/65712151/websockets-with-django-channels-on-heroku
+
 socket
 	send to users connected to web socket, not logged in 
 

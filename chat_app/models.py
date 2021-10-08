@@ -7,7 +7,7 @@ from .model_methods import *
 
 
 class Room(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
 
     # def last_message(self, username):
     def serialize(self, user, mode):
