@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -20,12 +21,19 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','jge67wgtdr0bjxbk!!mzjwr*yn&+zy@$*2(w+%zi-_45(&e6*h')
+=======
+# SECRET_KEY = 'jge67wgtdr0bjxbk!!mzjwr*yn&+zy@$*2(w+%zi-_45(&e6*h'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','jge67wgtdr0bjxbk!!mzjwr*yn&+zy@$*2(w+%zi-_45(&e6*h')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+>>>>>>> 557f2e9d649fe1b68e46090294ca49762416dff2
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+
+ALLOWED_HOSTS = ['.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -56,6 +64,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -142,9 +151,26 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            # "hosts": [('127.0.0.1', 6379)],
+            "hosts": [os.environ.get('REDIS_URL', ('127.0.0.1', 6379))],
+            # "hosts": ["redis://:p4cb640b88ee56374ca92146d8fd950ceec2dbc1a20c9a1a2e89441ff687683d2@ec2-3-210-47-237.compute-1.amazonaws.com:16189"],
         },
     },
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Heroku: Update database configuration from $DATABASE_URL.
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# The URL to use when referring to static files (where they will be served from)
+STATIC_URL = '/static/'

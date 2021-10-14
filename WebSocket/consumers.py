@@ -1,5 +1,5 @@
 # chat/consumers.py
-from asyncio.windows_events import NULL
+# from asyncio.windows_events import NULL
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
