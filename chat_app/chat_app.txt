@@ -1,6 +1,14 @@
 deployment
+	requirements.txt runtime.txt profile database staticfiles redis
+
+	procfile
+		https://stackoverflow.com/questions/57778854/i-cannot-use-history-push-properly-with-reactjs
+
 	wss error:
 		https://stackoverflow.com/questions/65712151/websockets-with-django-channels-on-heroku
+
+	Django_settings error:
+		https://stackoverflow.com/questions/26082128/improperlyconfigured-you-must-either-define-the-environment-variable-django-set
 
 socket
 	send to users connected to web socket, not logged in 

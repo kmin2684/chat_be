@@ -4,10 +4,10 @@
             "path": "."
         },
         {
-            "path": "..\\..\\channel_tutorial\\mysite"
+            "path": "..\\chat_fe"
         },
         {
-            "path": "..\\chat_fe"
+            "path": "..\\chat_BE_heroku"
         }
     ]
 }
